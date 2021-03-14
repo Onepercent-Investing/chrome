@@ -1,0 +1,29 @@
+name: develop
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out code
+        id: clone
+
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker image
+        id: build
+        with:
+          image: ${{ secrets.AWS_ECR_IMAGE }}
+          registry: ${{ secrets.AWS_ECR_REGISTRY }}
+          buildArgs: 'USE_CHROME_STABLE=true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Log output
+        run: echo "::debug::Deployed tags ${{steps.build.output.tags}}"
