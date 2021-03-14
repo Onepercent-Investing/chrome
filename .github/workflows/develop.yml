@@ -21,9 +21,10 @@ jobs:
           image: ${{ secrets.AWS_ECR_IMAGE }}
           registry: ${{ secrets.AWS_ECR_REGISTRY }}
           buildArgs: 'USE_CHROME_STABLE=true'
+          tags: ${GITHUB_REF##*/}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Log output
-        run: echo "::debug::Deployed tags ${{steps.build.output.tags}}"
+        run: echo "::debug::Deployed tags ${{steps.build.outputs.tags}}"
