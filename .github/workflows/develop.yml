@@ -15,8 +15,9 @@ jobs:
         id: clone
 
       - name: Extract branch name
+        id: branch
         shell: bash
-        run: echo "::set-env name=TAG::${GITHUB_REF##*/}"
+        run: echo "::set-output name=tag::${GITHUB_REF##*/}"
 
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
@@ -25,10 +26,10 @@ jobs:
           image: ${{ secrets.AWS_ECR_IMAGE }}
           registry: ${{ secrets.AWS_ECR_REGISTRY }}
           buildArgs: 'USE_CHROME_STABLE=true'
-          tags: ${{ env.TAG }}
+          tags: ${{ steps.branch.outputs.tag }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Log output
-        run: echo "::debug::Deployed tags ${{steps.build.outputs.tags}}"
+        run: echo "::debug::Deployed tags ${{ steps.build.outputs.tags }}"
